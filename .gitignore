@@ -1,0 +1,4 @@
+.env
+domanager/
+node_modules/
+bin/
