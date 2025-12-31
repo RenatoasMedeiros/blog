@@ -35,6 +35,36 @@ func (ps *PostStore) Create(ctx context.Context, post *Post) error {
 	return nil
 }
 
+func (ps *PostStore) GetAll(ctx context.Context) ([]*Post, error) {
+	query := `SELECT id, title, content, created_at, updated_at FROM posts ORDER BY id ASC WHERE is_deleted = FALSE`
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
+	rows, err := ps.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	posts := []*Post{}
+	for rows.Next() {
+		var post Post
+		err := rows.Scan(
+			&post.ID,
+			&post.Title,
+			&post.Content,
+			&post.CreatedAt,
+			&post.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, &post)
+	}
+
+	return posts, nil
+}
+
 func (ps *PostStore) GetByID(ctx context.Context, id int64) (*Post, error) {
 	query := `
 		SELECT 
