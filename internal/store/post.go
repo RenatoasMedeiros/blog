@@ -36,7 +36,12 @@ func (ps *PostStore) Create(ctx context.Context, post *Post) error {
 }
 
 func (ps *PostStore) GetAll(ctx context.Context) ([]*Post, error) {
-	query := `SELECT id, title, content, created_at, updated_at FROM posts ORDER BY id ASC WHERE is_deleted = FALSE`
+	query := `
+    SELECT id, title, content, created_at, updated_at 
+    FROM posts 
+    WHERE is_deleted = FALSE 
+    ORDER BY id ASC
+`
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
 	defer cancel()
 
