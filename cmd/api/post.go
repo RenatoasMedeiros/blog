@@ -82,6 +82,25 @@ func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (app *application) getAllPostsHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	posts, err := app.store.Posts.GetAll(ctx)
+	if err != nil {
+		switch {
+		case errors.Is(err, store.ErrNotFound):
+			app.notFoundResponse(w, r, err)
+		default:
+			app.internalServerError(w, r, err)
+		}
+		return
+	}
+
+	if err := jsonResponse(w, http.StatusOK, posts); err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+}
+
 func (app *application) deletePostHandler(w http.ResponseWriter, r *http.Request) {
 	postIdParam := chi.URLParam(r, "postID")
 
