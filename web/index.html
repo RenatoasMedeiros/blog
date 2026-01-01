@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Consumer</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 2rem;
+      }
+      .post {
+        border: 1px solid #ccc;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 5px;
+      }
+      .post h2 {
+        margin-top: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Blog Posts</h1>
+    <div id="posts-container">Loading...</div>
+
+    <script>
+      const API_URL = "http://localhost:8080/v1/posts";
+
+      async function fetchPosts() {
+        try {
+          const response = await fetch(API_URL);
+          if (!response.ok) throw new Error("Network response was not ok");
+
+          const posts = await response.json();
+          const container = document.getElementById("posts-container");
+          container.innerHTML = "";
+
+          posts.forEach((post) => {
+            const postDiv = document.createElement("div");
+            postDiv.className = "post";
+
+            const title = post.title || "No Title";
+            const content = post.content || post.body || JSON.stringify(post);
+
+            postDiv.innerHTML = `<h2>${title}</h2><p>${content}</p>`;
+            container.appendChild(postDiv);
+          });
+        } catch (error) {
+          document.getElementById("posts-container").innerHTML =
+            "Error loading posts: " + error.message;
+        }
+      }
+
+      fetchPosts();
+    </script>
+  </body>
+</html>
